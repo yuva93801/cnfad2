@@ -1,0 +1,96 @@
+public class Product {
+
+	@Min(value=0)
+	@Max(value=200)
+	int id;
+
+
+	@Min(value=0)
+	@Max(value=200)
+	int price;
+
+	@NotEmpty
+	@Length(max=200)
+	String name;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getPrice() {
+		return price;
+	}
+	public void setPrice(int price) {
+		this.price = price;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", price=" + price + ", name=" + name +"]";
+	}
+
+
+
+}
+
+
+
+
+
+
+@RestController
+@RequestMapping("/lab")
+public class ProductController {
+	
+	
+
+		List <Product> list=new ArrayList<Product>();
+		
+		@GetMapping
+		public List<Product> getProduct(){
+			return list;
+		}
+		@PostMapping
+		public ResponseEntity <?>  postProduct(@Valid @RequestBody Product product,BindingResult results){
+			List <String> errors=new ArrayList<String>();
+			if(results.hasErrors()) {
+				for(FieldError error:results.getFieldErrors()) {
+					errors.add(error.getField()+" "+error.getDefaultMessage());
+				}
+				return ResponseEntity.badRequest().body(errors);
+			}
+			else {
+			list.add(product);
+			return ResponseEntity.ok(list);
+			
+		}
+			
+		}
+		@DeleteMapping("/{id}")
+		public List<Product> deleteProduct(@PathVariable int id){
+			for(Product p:list) {
+				if(id==p.getId()) {
+					list.remove(p);
+				}
+			}
+			return list;
+		}
+		
+		@PutMapping
+		public List<Product> putProduct(@RequestBody Product product){
+			for (Product P:list) {
+				if(product.getId()==P.getId()) {
+					P.setName(product.getName());
+					P.setPrice(product.getPrice());
+					break;
+				}
+			}
+			return list;
+		}
+		
