@@ -1,0 +1,30 @@
+DOCKER-FILE
+FROM eclipse-temurin:17-jdk-alpine
+VOLUME /tmp
+COPY /target/*.jar app.jar
+ENTRYPOINT [ "java","-jar","/app.jar"]
+
+
+
+Then open the terminal and type the following commands 
+
+sudo apt update 
+cd and copy the path of the prg8 file 
+ls
+docker build.
+Docker images
+docker build -t prg8:latest .
+Docker images
+docker run -idtp 8080:8080 prg8
+docker ps
+then open chrome and localhost:8080
+the [] should be displayed
+
+
+TO perform the GET,POST,DELETE AND UPDATE METHODS
+
+make sure the docker file is running 
+for get:   curl -X GET http://localhost:8080/product
+for post: curl -X POST -H "Content-Type: application/json" -d '{"id":1,"name":"Laptop","price":1200}' http://localhost:8080/product
+for delete: curl -X DELETE http://localhost:8080/product/1
+for update: curl -X PUT -H "Content-Type: application/json" -d '{"id":1,"name":"Smartphone","price":800}' http://localhost:8080/product
