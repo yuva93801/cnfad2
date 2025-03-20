@@ -1,0 +1,155 @@
+package com.example.demo;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+
+@Configuration
+public class AppConfig {
+	
+	@Bean
+	@Scope("prototype")
+	Customer getCustomer() {
+	Customer c=new Customer();
+	c.setTick(getTicket());
+	return c;
+	
+	}
+	
+	@Bean
+	@Scope("singleton")
+	Ticket getTicket() {
+		return new Ticket();
+		
+	}
+
+}
+
+
+
+
+package com.example.demo;
+
+public class Customer {
+private String name,address;
+private Ticket Tick;
+public String getName() {
+	return name;
+}
+public void setName(String name) {
+	this.name = name;
+}
+public String getAddress() {
+	return address;
+}
+public void setAddress(String address) {
+	this.address = address;
+}
+public Ticket getTick() {
+	return Tick;
+}
+public void setTick(Ticket tick) {
+	this.Tick = tick;
+}
+
+
+}
+
+
+
+
+
+package com.example.demo;
+
+import java.util.Scanner;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+@SpringBootApplication
+public class P1Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(P1Application.class, args);
+		AnnotationConfigApplicationContext ac=new AnnotationConfigApplicationContext(AppConfig.class);
+		
+		
+		Customer c=ac.getBean(Customer.class);
+		Ticket t=ac.getBean(Ticket.class);
+		Scanner scanner=new Scanner(System.in);
+		System.out.println("Enter customer details:");
+		System.out.println("Name:");
+		c.setName(scanner.nextLine());
+	
+		System.out.println("Address:");
+		c.setAddress(scanner.nextLine());
+		
+		System.out.println("Enter Ticket Details:");
+		System.out.println("Ticket Number:");
+		t.setTicno(scanner.nextInt());
+		
+		System.out.println("price:");
+		t.setPrice(scanner.nextInt());
+		
+		System.out.println("seat nu:");
+		t.setSeatno(scanner.nextInt());
+		scanner.nextLine();
+		
+		System.out.println("Ticket Type:");
+		t.setTictype(scanner.nextLine());
+		
+		System.out.println("customer details:");
+		System.out.println("customer name:"+c.getName());
+		System.out.println("customer address:"+c.getAddress());
+		System.out.println("Ticket Details:");
+		System.out.println("Ticket no:"+t.getTicno());
+		System.out.println("Ticket seat no:"+t.getSeatno());
+		System.out.println("Ticket price:"+t.getPrice());
+		System.out.print("Ticket type:"+t.getTictype());
+		System.out.println();
+		System.out.println("end of display");
+		scanner.close();
+		ac.close();
+		
+		
+		
+		
+		
+	}
+
+}
+
+
+
+package com.example.demo;
+
+public class Ticket {
+
+private	int ticno,price,seatno;
+private	String tictype;
+public int getTicno() {
+	return ticno;
+}
+public void setTicno(int ticno) {
+	this.ticno = ticno;
+}
+public int getPrice() {
+	return price;
+}
+public void setPrice(int price) {
+	this.price = price;
+}
+public int getSeatno() {
+	return seatno;
+}
+public void setSeatno(int seatno) {
+	this.seatno = seatno;
+}
+public String getTictype() {
+	return tictype;
+}
+public void setTictype(String tictype) {
+	this.tictype = tictype;
+}
+	
