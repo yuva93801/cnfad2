@@ -1,0 +1,126 @@
+package com.example.demo;
+
+public class Product {
+
+	int id,price;	String name;
+
+	public int getId() {
+
+		return id;
+
+	}
+
+	public void setId(int id) {
+
+		this.id = id;
+
+	}
+
+	public int getPrice() {
+
+		return price;
+
+	}
+
+	public void setPrice(int price) {
+
+		this.price = price;
+
+	}
+
+	public String getName() {
+
+		return name;
+
+	}
+
+	public void setName(String name) {
+
+		this.name = name;
+
+	}
+
+	@Override
+
+	public String toString() {
+
+		return "Product [id=" + id + ", price=" + price + ", name=" + name + "]";
+
+	}
+
+	
+
+	
+
+}
+
+@RestController
+
+@RequestMapping("/lab")
+
+public class ProductController {
+
+	List <Product> list=new ArrayList<Product>();	
+
+	@GetMapping
+
+	public List<Product> getProduct(){
+
+		return list;
+
+	}
+
+	@PostMapping
+
+	public List<Product> postProduct(@RequestBody Product product){
+
+		list.add(product);
+
+		return list;
+
+	}
+
+	
+
+	@DeleteMapping("/{id}")
+
+	public List<Product> deleteProduct(@PathVariable int id){
+
+		for(Product p:list) {
+
+			if(id==p.getId()) {
+
+				list.remove(p);
+
+			}
+
+		}
+
+		return list;
+
+	}
+
+	
+
+	@PutMapping
+
+	public List<Product> putProduct(@RequestBody Product product){
+
+		for (Product P:list) {
+
+			if(product.getId()==P.getId()) {
+
+				P.setName(product.getName());
+
+				P.setPrice(product.getPrice());
+
+				break;
+
+			}
+
+		}
+
+		return list;
+
+	}
+
