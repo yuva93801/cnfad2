@@ -1,0 +1,155 @@
+package com.example.demo;
+
+public class College {
+	String name,address;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	@Override
+	public String toString() {
+		return "College [name=" + name + ", address=" + address + "]";
+	}
+	
+	
+
+}
+
+
+
+
+package com.example.demo;
+
+public class Department {
+	int id;
+	String name,description;
+	College  college;
+	
+	
+	public Department(College college) {
+		super();
+		this.college = college;
+	}
+	
+	public College getCollege() {
+		return college;
+	}
+
+	public void setCollege(College college) {
+		this.college = college;
+	}
+
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	@Override
+	public String toString() {
+		return "Department [id=" + id + ", name=" + name + ", description=" + description + "]";
+	}
+	
+
+}
+
+
+
+
+package com.example.demo;
+import java.util.*;
+
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class Lab2Application {
+
+	public static void main(String[] args) {
+		SpringApplication.run(Lab2Application.class, args);
+		Scanner sc = new Scanner(System.in);
+		ApplicationContext ac=new ClassPathXmlApplicationContext("coldept.xml");
+		Department dt = (Department) ac.getBean("department");
+		
+		while(true) {
+			System.out.println("1.insert department details\n"
+					+"2. Display Department with college details\n"
+					+"3. exit");
+			System.out.println("enter ur choice:");
+			int a=sc.nextInt();
+			switch(a) {
+			case 1:
+				System.out.println("enter the department name:");
+				dt.setName(sc.next());
+				System.out.println("enter department no:");
+				dt.setId(sc.nextInt());
+				System.out.println("enter department description:");
+				dt.setDescription(sc.next());
+				System.out.println("thanks for input");
+				break;
+			case 2:
+				System.out.println("Department Details");
+				System.out.println("name:"+dt.getName()+" "+"ID:"+dt.getId()+"Department Description"+dt.getDescription());
+				System.out.println("college details");
+				College c=dt.getCollege();
+				System.out.println("college name:"+c.getName());
+				System.out.println("college Address:"+c.getAddress());
+				break;
+			case 3:
+				System.exit(0);
+			
+			}
+		}
+		
+		
+	}
+
+}
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	<bean id="college" class="com.example.demo.College" scope="singleton">
+		<property name="name" value="RV" />
+		<property name="addrss" value="Mysuru road" />
+	</bean>
+
+	<bean id="department" class="com.example.demo.Department" scope="prototype">
+		<constructor-arg name="college" ref="college" />
+
+	</bean>
+</beans>
