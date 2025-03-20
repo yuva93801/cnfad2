@@ -1,0 +1,167 @@
+spring.application.name=Program7
+spring.datasource.url=jdbc:mysql://172.16.34.46:3306/1rv23mc042
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.username=1rv22mc031
+spring.datasource.password=1rv22mc031
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+----------------------------------------------------------------------
+
+@Entity
+@Table(name="Student")
+
+public class Student {
+@Id
+@GeneratedValue(strategy=GenerationType.IDENTITY)
+long id;
+
+@Column
+String usn,name,address;
+
+public long getId() {
+	return id;
+}
+
+public void setId(long id) {
+	this.id = id;
+}
+
+public String getUsn() {
+	return usn;
+}
+
+public void setUsn(String usn) {
+	this.usn = usn;
+}
+
+public String getName() {
+	return name;
+}
+
+public void setName(String name) {
+	this.name = name;
+}
+
+public String getAddress() {
+	return address;
+}
+
+public void setAddress(String address) {
+	this.address = address;
+}
+
+@Override
+public String toString() {
+	return "Student [id=" + id + ", usn=" + usn + ", name=" + name + ", address=" + address + "]";
+}
+}
+
+
+
+
+-------------------------------------------------------
+package com.example.ecommerceapp;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface StudentRepository extends JpaRepository<Student, Integer> {
+
+}
+
+
+-------------------------------------------------------
+
+
+package com.example.ecommerceapp;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class StudentService {
+	
+	@Autowired
+	StudentRepository sr;
+	public List<Student> display(){
+		List<Student> slist=sr.findAll();
+		return slist;
+	}
+	
+	public String insert(String name, String usn, String addr) {
+		int status=0;
+		Student s = new Student();
+		s.setUsn(usn);
+		s.setName(name);
+		s.setAddress(addr);
+		sr.save(s);
+		return "inserted into table";
+	}
+	
+	public String delete(String usn) {
+		List<Student> slist=sr.findAll();
+		for(Student s:slist) {
+			if(s.getUsn().equalsIgnoreCase(usn)) {
+				sr.delete(s);
+				return "student record deleted";
+			}else {
+				return "student not found";
+			}
+		}
+		return "";
+		
+	}
+}
+
+
+--------------------------------------------------------
+
+package com.example.ecommerceapp;
+
+import java.util.Scanner;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class Program7Application {
+
+	public static void main(String[] args) {
+		ApplicationContext ac=SpringApplication.run(Program7Application.class, args);
+		StudentService ss = ac.getBean(StudentService.class);
+		Scanner sc = new Scanner(System.in);
+		while(true) {
+			System.out.println("1.insert\n2.view all\n3.delete\n enter choice:");
+			int ch=sc.nextInt();
+			switch(ch) {
+			case 1:
+				System.out.print("\nEnter usn,name,addr\n");
+				String usn=sc.next();
+				String name= sc.next();
+				String addr=sc.next();
+				ss.insert(name,usn,addr);
+				System.out.println("usn="+usn+"\n name="+name+"\n addr="+addr);
+				break;
+			case 2:
+				System.out.println("all students:");
+				System.out.println(ss.display());
+				break;
+			case 3:
+				System.out.println("student usn to be deleted:");
+				String ssn=sc.next();
+				System.out.println(ss.delete(ssn));
+				System.out.println(ss.display());
+				break;
+			case 4:
+				System.out.println("exiting");
+				System.exit(0);
+				
+				break;
+			default:
+				System.out.println("invalid choice");
+			}
+		}
+	}
+}
