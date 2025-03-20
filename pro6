@@ -1,0 +1,360 @@
+public class Product {
+
+	@Min(value=0)
+	@Max(value=200)
+	int id;
+
+
+	@Min(value=0)
+	@Max(value=200)
+	int price;
+
+	@NotEmpty
+	@Length(max=200)
+	String name;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getPrice() {
+		return price;
+	}
+	public void setPrice(int price) {
+		this.price = price;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	@Override
+	public String toString() {
+		return "Product [id=" + id + ", price=" + price + ", name=" + name +"]";
+	}
+
+
+
+}
+
+
+
+
+
+
+@RestController
+@RequestMapping("/lab")
+public class ProductController {
+	
+	
+
+		List <Product> list=new ArrayList<Product>();
+		
+		@GetMapping
+		public List<Product> getProduct(){
+			return list;
+		}
+		@PostMapping
+		public ResponseEntity <?>  postProduct(@Valid @RequestBody Product product,BindingResult results){
+			List <String> errors=new ArrayList<String>();
+			if(results.hasErrors()) {
+				for(FieldError error:results.getFieldErrors()) {
+					errors.add(error.getField()+" "+error.getDefaultMessage());
+				}
+				return ResponseEntity.badRequest().body(errors);
+			}
+			else {
+			list.add(product);
+			return ResponseEntity.ok(list);
+			
+		}
+			
+		}
+		@DeleteMapping("/{id}")
+		public List<Product> deleteProduct(@PathVariable int id){
+			for(Product p:list) {
+				if(id==p.getId()) {
+					list.remove(p);
+				}
+			}
+			return list;
+		}
+		
+		@PutMapping
+		public List<Product> putProduct(@RequestBody Product product){
+			for (Product P:list) {
+				if(product.getId()==P.getId()) {
+					P.setName(product.getName());
+					P.setPrice(product.getPrice());
+					break;
+				}
+			}
+			return list;
+		}
+		
+		
+
+Program 6 
+
+package rvce.lab.programs;
+
+
+
+-----------------------------------------------------------------
+Student.java
+-----------------------------------------------------------
+
+public class Student {
+	int id,totalMarks;
+	String usn,name,address;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public int getTotalMarks() {
+		return totalMarks;
+	}
+	public void setTotalMarks(int totalMarks) {
+		this.totalMarks = totalMarks;
+	}
+	public String getUsn() {
+		return usn;
+	}
+	public void setUsn(String usn) {
+		this.usn = usn;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", totalMarks=" + totalMarks + ", usn=" + usn + ", name=" + name + ", address="
+				+ address + "]";
+	}
+	
+}
+
+
+
+
+---------------------------------------------------------------
+hybernate-config.cfg.xml
+--------------------------------------------------------------
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+	"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+	"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+<session-factory>
+	<property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+	<property name="hibernate.connection.url">jdbc:mysql://172.16.34.46:3306/mca042</property>
+        <property name="hibernate.connection.username">mca042</property>
+        <property name="hibernate.connection.password">mca042</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.show_sql">true</property>
+        <mapping resource="student.hbm.xml"/>
+</session-factory>
+	
+</hibernate-configuration>
+
+
+
+
+-----------------------------------------------------------
+Hibe_test
+-----------------------------------------------------------
+
+
+package rvce.lab.programs;
+import java.util.List;
+import java.util.Scanner;
+import org.hibernate.*;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.query.Query;
+
+public class Hibe_test {
+	public Session getSession() {
+        SessionFactory sFactory = new Configuration().configure("hybernate-config.cfg.xml").buildSessionFactory();
+        return sFactory.openSession();
+    }
+
+    public void insert(int id, String name, String address, int totalMarks) {
+        Student student = new Student();
+        student.setId(id);
+        student.setName(name);
+        student.setAddress(address);
+        student.setTotalMarks(totalMarks);
+        student.setUsn(address);
+
+        Session session = getSession();
+        Transaction transaction = session.beginTransaction();
+        session.save(student);
+        transaction.commit();
+        session.close();
+    }
+
+    public List<Student> display() {
+        Session session = getSession();
+        Query<Student> query = session.createQuery("from Student", Student.class);
+        List<Student> students = query.getResultList();
+        session.close();
+        return students;
+    }
+
+    public void search(String name) {
+        Session session = getSession();
+        Transaction transaction = session.beginTransaction();
+        Query<Student> query = session.createQuery("from Student name = :name", Student.class);
+        query.setParameter("name", name);
+        System.out.println(query.list());
+        transaction.commit();
+        session.close();
+    }
+
+    public void delete(String name) {
+        Session session = getSession();
+        Transaction transaction = session.beginTransaction();
+        Query query = session.createQuery("delete from Student where name = :name");
+        query.setParameter("name", name);
+        int rows = query.executeUpdate();
+        System.out.println("Rows Deleted: " + rows);
+        transaction.commit();
+        session.close();
+    }
+
+    public static void main(String[] args) {
+        Hibe_test hb = new Hibe_test();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("----------------MENU-----------------");
+            System.out.println("\n1. Insert \n2.Search \n3.Display \n4.Delete \n5.Exit");
+            System.out.print("Enter your Choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Clear the buffer after reading an integer
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter ID: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine(); // Clear the buffer
+                    System.out.print("Enter Name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter Address: ");
+                    String address = scanner.nextLine();
+                    System.out.print("Enter Total Marks: ");
+                    int totalMarks = scanner.nextInt();
+                    scanner.nextLine(); // Clear the buffer
+                    hb.insert(id, name, address, totalMarks);
+                    break;
+
+                case 2:
+                    System.out.print("Enter Name to Search: ");
+                    String searchName = scanner.nextLine();
+                    hb.search(searchName);
+                    break;
+
+                case 3:
+                    List<Student> students = hb.display();
+                    for (Student student : students) {
+                        System.out.println(student);
+                    }
+                    break;
+
+                case 4:
+                    System.out.print("Enter Name to Delete: ");
+                    String deleteName = scanner.nextLine();
+                    hb.delete(deleteName);
+                    break;
+
+                case 5:
+                    System.out.println("Exiting program...");
+                    scanner.close();
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid Choice!");
+            }
+        }
+    }
+}
+
+
+
+
+
+------------------------------------------------------------
+student.cfg.xml
+-----------------------------------------------------------
+
+
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="rvce.lab.programs.Student" table="student">
+        <id name="id" type="int" column="id">
+            <generator class="native" />
+        </id>
+        <property name="usn" column="usn" type="string" />
+        <property name="name" column="name" type="string" />
+        <property name="address" column="address" type="string" />
+        <property name="totalMarks" column="totalMarks" type="int" />
+    </class>
+</hibernate-mapping>
+
+
+
+
+
+
+------------------------------------------
+pom.xml(Dependencies)
+------------------------------------------
+<dependency>
+<groupId>org.hibernate</groupId>
+<artifactId>hibernate-core</artifactId>
+<version>5.6.7.Final</version>
+</dependency>
+
+
+
+
+
+Terminal
+
+CMD1: sudo mysql -u mca042 -h 172.16.34.53 -p
+
+CMD2: Create database student;
+
+CMD3: USE student;
+ 
+CMD4: create table student(id INT AUTO_INCREMENT PRIMARY KEY,
+				usn VARCHAR(100),
+				name VARCHAR(100),
+				address VARCHAR(255),
+				totalMarks INT);
+
+
+
+
